@@ -2,6 +2,9 @@ use std::path::PathBuf;
 use structopt::StructOpt;
 
 mod endpoint;
+use endpoint::Endpoint;
+
+mod router;
 
 #[derive(StructOpt)]
 struct Opts {
@@ -15,7 +18,7 @@ struct Opts {
 fn main() -> Result<(), std::io::Error> {
     let opts = Opts::from_args();
 
-    let endpoint = match endpoint::Endpoint::from_file(opts.path, opts.payload_path) {
+    let endpoint = match Endpoint::from_file(opts.path, opts.payload_path) {
         Ok(endpoint) => endpoint,
         Err(e) => return Err(e),
     };
