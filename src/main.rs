@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
+use warp;
 
 mod endpoint;
 use endpoint::Endpoint;
@@ -15,15 +16,16 @@ struct Opts {
     payload_path: PathBuf,
 }
 
-fn main() -> Result<(), std::io::Error> {
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
     let opts = Opts::from_args();
 
     let endpoint = match Endpoint::from_file(opts.path, opts.payload_path) {
         Ok(endpoint) => endpoint,
         Err(e) => return Err(e),
     };
+    let routes = router::router(endpoint);
 
-    println!("Doubling path: {}", endpoint.path);
-    println!("Doubling payload: \n{}", endpoint.payload);
+    warp::serve(routes).run(([127, 0, 0, 1], 3131)).await;
     Ok(())
 }
